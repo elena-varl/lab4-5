@@ -38,8 +38,8 @@ private var dueTime:LocalTime?=null
             val editable= Editable.Factory.getInstance()
             binding.name.text=editable.newEditable(taskItem!!.name)
             binding.description.text=editable.newEditable(taskItem!!.description)
-            if (taskItem!!.dueTime!=null)
-                dueTime=taskItem!!.dueTime!!
+            if (taskItem!!.dueTime()!=null)
+                dueTime=taskItem!!.dueTime()!!
             updateTimeButtonText()
 
         }
@@ -47,6 +47,7 @@ private var dueTime:LocalTime?=null
             binding.taskTitle.text = "New task"
 
         }
+
 
         taskViewModel=ViewModelProvider(activity).get(TaskViewModel::class.java)
 
@@ -75,6 +76,7 @@ private var dueTime:LocalTime?=null
 
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateTimeButtonText() {
         binding.timePickerButton.text= String.format("%02d:%02d",dueTime!!.hour, dueTime!!.minute)
@@ -90,17 +92,22 @@ private var dueTime:LocalTime?=null
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun saveAction() {
      val name=binding.name.text.toString()
      val description=binding.description.text.toString()
+        val dueTimeString= if (dueTime==null ) null else TaskItem.timeFormatter.format(dueTime)
         if (taskItem==null)
         {
-            val newTask=TaskItem(name, description, dueTime, null)
-            taskViewModel.addTask(newTask)
+            val newTask=TaskItem(name, description, dueTimeString, null)
+            taskViewModel.addTaskItem(newTask)
         }
         else
         {
-            taskViewModel.updateTask(taskItem!!.id, name, description, dueTime)
+            taskItem!!.name = name
+            taskItem!!.description=description
+            taskItem!!.dueTimeString=dueTimeString
+            taskViewModel.updateTaskItem(taskItem!!)
         }
         binding.name.setText("")
         binding.description.setText("")

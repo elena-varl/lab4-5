@@ -3,15 +3,19 @@ package com.example.lab4
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.lab4.databinding.ActivityMainBinding
 
+@RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : AppCompatActivity(), TaskItemClickListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var taskViewModel: TaskViewModel
+    private val taskViewModel: TaskViewModel by viewModels{
+        TaskItemModelFactory((application as TodoApplication).repository)
+    }
 
 
 
@@ -19,7 +23,7 @@ class MainActivity : AppCompatActivity(), TaskItemClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+
         binding.newTaskButton.setOnClickListener {
             NewTaskSheet(null).show(supportFragmentManager, "newTaskTag")
 
